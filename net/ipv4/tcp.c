@@ -1132,6 +1132,7 @@ int tcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
 	int mss_now = 0, size_goal, copied_syn = 0;
 	bool sg;
 	long timeo;
+	u8 preferred_path_index;
 
 	lock_sock(sk);
 
@@ -1196,7 +1197,6 @@ int tcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
 	while (msg_data_left(msg)) {
 		int copy = 0;
 		int max = size_goal;
-
 		skb = tcp_write_queue_tail(sk);
 		if (tcp_send_head(sk)) {
 			if (skb->ip_summed == CHECKSUM_NONE)
@@ -1217,6 +1217,11 @@ new_segment:
 						  sk->sk_allocation);
 			if (!skb)
 				goto wait_for_memory;
+
+			preferred_path_index = (msg->msg_flags >> 16) & 0XFF;
+			printk(KERN_INFO "%s preffered_path_index: %u\n",
+				__func__, preferred_path_index);
+			TCP_SKB_CB(skb)->preferred_path_index = preferred_path_index;
 
 			/*
 			 * Check whether we can use HW checksum.
