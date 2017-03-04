@@ -876,6 +876,10 @@ struct tcp_skb_cb {
 		};
 #endif
 	};
+
+#ifdef CONFIG_MPTCP
+	__u8 preferred_path_index; /* force-send SKB on path_index */
+#endif
 };
 
 #define TCP_SKB_CB(__skb)	((struct tcp_skb_cb *)&((__skb)->cb[0]))

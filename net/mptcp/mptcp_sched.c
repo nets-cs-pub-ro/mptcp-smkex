@@ -146,6 +146,7 @@ static struct sock
 	bool found_unused = false;
 	bool found_unused_una = false;
 	struct sock *sk;
+	u8 preferred_path_index = TCP_SKB_CB(skb)->preferred_path_index;
 
 	mptcp_for_each_sk(mpcb, sk) {
 		struct tcp_sock *tp = tcp_sk(sk);
@@ -184,6 +185,14 @@ static struct sock
 			found_unused = true;
 		}
 
+		if (preferred_path_index)
+			if (preferred_path_index & tp->mptcp->path_index) {
+				printk(KERN_INFO "%s: send on preferred path index: %u\n",
+				       __func__, preferred_path_index);
+				bestsk = sk;
+				break;
+		}
+
 		if (tp->srtt_us < min_srtt) {
 			min_srtt = tp->srtt_us;
 			bestsk = sk;
@@ -206,6 +215,13 @@ static struct sock
 			*force = true;
 		else
 			*force = false;
+	}
+
+	if (bestsk && !(preferred_path_index & tcp_sk(bestsk)->mptcp->path_index)) {
+		printk(KERN_INFO "%s: found best socket but with wrong path index: %u:%u\n",
+			__func__, preferred_path_index, tcp_sk(bestsk)->mptcp->path_index);
+		bestsk = NULL;
+		*force = true;
 	}
 
 	return bestsk;
