@@ -272,8 +272,6 @@ struct ucred {
 #define MSG_ERRQUEUE	0x2000	/* Fetch message from error queue */
 #define MSG_NOSIGNAL	0x4000	/* Do not generate SIGPIPE */
 #define MSG_MORE	0x8000	/* Sender will send more */
-#define MSG_WAITFORONE	0x10000	/* recvmmsg(): block until 1+ packets avail */
-#define MSG_SENDPAGE_NOTLAST 0x20000 /* sendpage() internal : not the last page */
 #define MSG_EOF         MSG_FIN
 
 #define MSG_FASTOPEN	0x20000000	/* Send data in TCP SYN */
@@ -284,6 +282,8 @@ struct ucred {
 #define MSG_CMSG_COMPAT	0x80000000	/* This message needs 32 bit fixups */
 #else
 #define MSG_CMSG_COMPAT	0		/* We never have 32 bit fixups */
+#define MSG_WAITFORONE	0x10000000	/* recvmmsg(): block until 1+ packets avail */
+#define MSG_SENDPAGE_NOTLAST 0x01000000 /* sendpage() internal : not the last page */
 #endif
 
 
