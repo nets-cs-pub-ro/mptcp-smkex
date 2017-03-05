@@ -187,8 +187,6 @@ static struct sock
 
 		if (preferred_path_index)
 			if (preferred_path_index & tp->mptcp->path_index) {
-				printk(KERN_INFO "%s: send on preferred path index: %u\n",
-				       __func__, preferred_path_index);
 				bestsk = sk;
 				break;
 		}
@@ -219,8 +217,6 @@ static struct sock
 
 	if (preferred_path_index && bestsk &&
 	    !(preferred_path_index & tcp_sk(bestsk)->mptcp->path_index)) {
-		printk(KERN_INFO "%s: found best socket but with wrong path index: %u:%u\n",
-			__func__, preferred_path_index, tcp_sk(bestsk)->mptcp->path_index);
 		bestsk = NULL;
 		*force = true;
 	}

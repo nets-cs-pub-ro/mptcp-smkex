@@ -1219,8 +1219,6 @@ new_segment:
 				goto wait_for_memory;
 
 			preferred_path_index = (msg->msg_flags >> 16) & 0XFF;
-			printk(KERN_INFO "%s preffered_path_index: %u\n",
-				__func__, preferred_path_index);
 			TCP_SKB_CB(skb)->preferred_path_index = preferred_path_index;
 
 			/*
