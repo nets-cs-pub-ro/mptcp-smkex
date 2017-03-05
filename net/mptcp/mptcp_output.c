@@ -540,6 +540,7 @@ static int mptcp_fragment(struct sock *meta_sk, struct sk_buff *skb, u32 len,
 	TCP_SKB_CB(skb)->mptcp_flags = flags & ~(MPTCPHDR_FIN);
 	TCP_SKB_CB(buff)->mptcp_flags = flags;
 	TCP_SKB_CB(buff)->path_mask = TCP_SKB_CB(skb)->path_mask;
+	TCP_SKB_CB(buff)->preferred_path_index = TCP_SKB_CB(skb)->preferred_path_index;
 
 	/* If reinject == 1, the buff will be added to the reinject
 	 * queue, which is currently not part of memory accounting. So
