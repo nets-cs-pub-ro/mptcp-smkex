@@ -4253,7 +4253,7 @@ bool tcp_try_coalesce(struct sock *sk, struct sk_buff *to, struct sk_buff *from,
 
 	*fragstolen = false;
 
-	if (mptcp(tcp_sk(sk)) && !is_meta_sk(sk))
+	if (mptcp(tcp_sk(sk)))
 		return false;
 
 	/* Its possible this segment overlaps with prior segment in queue */

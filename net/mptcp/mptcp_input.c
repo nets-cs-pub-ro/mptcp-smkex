@@ -979,13 +979,6 @@ static int mptcp_queue_skb(struct sock *sk)
 				goto next;
 			}
 
-			/* Is direct copy possible ? */
-			if (TCP_SKB_CB(tmp1)->seq == meta_tp->rcv_nxt &&
-			    meta_tp->ucopy.task == current &&
-			    meta_tp->copied_seq == meta_tp->rcv_nxt &&
-			    meta_tp->ucopy.len && sock_owned_by_user(meta_sk))
-				eaten = mptcp_direct_copy(tmp1, meta_sk);
-
 			if (mpcb->in_time_wait) /* In time-wait, do not receive data */
 				eaten = 1;
 

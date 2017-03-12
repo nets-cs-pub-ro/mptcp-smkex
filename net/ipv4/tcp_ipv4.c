@@ -1435,6 +1435,12 @@ int tcp_v4_do_rcv(struct sock *sk, struct sk_buff *skb)
 	if (is_meta_sk(sk))
 		return mptcp_v4_do_rcv(sk, skb);
 
+	if (tcp_sk(sk)->mptcp)
+		TCP_SKB_CB(skb)->preferred_path_index =
+				tcp_sk(sk)->mptcp->path_index;
+	else
+		TCP_SKB_CB(skb)->preferred_path_index = 1;
+
 	if (sk->sk_state == TCP_ESTABLISHED) { /* Fast path */
 		struct dst_entry *dst = sk->sk_rx_dst;
 

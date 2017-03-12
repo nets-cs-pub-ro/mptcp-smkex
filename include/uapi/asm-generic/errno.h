@@ -119,4 +119,6 @@
 
 #define EHWPOISON	133	/* Memory page has hardware error */
 
+#define EWRONGPATH	134	/* Wrong path index */
+
 #endif

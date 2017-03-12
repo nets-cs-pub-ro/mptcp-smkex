@@ -1636,6 +1636,8 @@ int tcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len, int nonblock,
 	struct task_struct *user_recv = NULL;
 	struct sk_buff *skb;
 	u32 urg_hole = 0;
+	u8 desired_path_index = (flags >> 16) & 0xFF; // subflow preferance
+	u8 real_path_index;
 
 	if (unlikely(flags & MSG_ERRQUEUE))
 		return inet_recv_error(sk, msg, len, addr_len);
@@ -1711,6 +1713,12 @@ int tcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len, int nonblock,
 				 *seq, TCP_SKB_CB(skb)->seq, tp->rcv_nxt,
 				 flags))
 				break;
+
+			real_path_index = TCP_SKB_CB(skb)->preferred_path_index;
+			if (real_path_index != desired_path_index) {	
+				copied = -EWRONGPATH;
+				goto out;
+			}
 
 			offset = *seq - TCP_SKB_CB(skb)->seq;
 			if (TCP_SKB_CB(skb)->tcp_flags & TCPHDR_SYN)
