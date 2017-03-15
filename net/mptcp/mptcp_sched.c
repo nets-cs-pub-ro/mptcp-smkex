@@ -186,7 +186,8 @@ static struct sock
 		}
 
 		if (preferred_path_index)
-			if (preferred_path_index & tp->mptcp->path_index) {
+			if ((preferred_path_index | tp->mptcp->path_index) ==
+				preferred_path_index) {
 				bestsk = sk;
 				break;
 		}
@@ -216,7 +217,8 @@ static struct sock
 	}
 
 	if (preferred_path_index && bestsk &&
-	    !(preferred_path_index & tcp_sk(bestsk)->mptcp->path_index)) {
+	    ((preferred_path_index | tcp_sk(bestsk)->mptcp->path_index)) !=
+		preferred_path_index) {
 		bestsk = NULL;
 		*force = true;
 	}
