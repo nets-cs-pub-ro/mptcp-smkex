@@ -1716,8 +1716,8 @@ int tcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len, int nonblock,
 
 			real_path_index = TCP_SKB_CB(skb)->preferred_path_index;
 			if (desired_path_index &&
-				(real_path_index != desired_path_index)) {	
-				copied = -EWRONGPATH;
+				(real_path_index != desired_path_index)) {
+				err = -EWRONGPATH;
 				tp->ucopy.task = NULL;
 				tp->ucopy.len = 0;
 				goto out;
