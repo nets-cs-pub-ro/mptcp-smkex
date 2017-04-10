@@ -744,9 +744,11 @@ static void mptcp_set_state(struct sock *sk)
 
         rcu_read_lock();
 		tcp_sk(sk)->mpcb->cnt_established++;
-        wq = rcu_dereference(sk->sk_wq);
-        if (wq_has_sleeper(wq))
-            wake_up_interruptible_poll(&wq->wait, POLLCONN);
+        if (!sk->sk_wq) {
+            wq = rcu_dereference(sk->sk_wq);
+            if (wq_has_sleeper(wq))
+                wake_up_interruptible_poll(&wq->wait, POLLCONN);
+        }
         rcu_read_unlock();
 	}
 }
