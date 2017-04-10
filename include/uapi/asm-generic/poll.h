@@ -21,6 +21,9 @@
 #ifndef POLLMSG
 #define POLLMSG		0x0400
 #endif
+#ifndef POLLCONN
+#define POLLCONN    0x0800
+#endif
 #ifndef POLLREMOVE
 #define POLLREMOVE	0x1000
 #endif

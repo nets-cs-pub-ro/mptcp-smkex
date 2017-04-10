@@ -118,6 +118,9 @@ enum {
 /* MPTCP API */
 
 #define MPTCP_GET_SUB_IDS	66	/* Get subflows ids */
+#define MPTCP_SET_SUB_EST_THRESHOLD 72
+#define MPTCP_GET_SUB_EST_THRESHOLD 73
+#define MPTCP_GET_SUB_EST_COUNT     74
 
 struct mptcp_sub_status {
 	__u8	id;
