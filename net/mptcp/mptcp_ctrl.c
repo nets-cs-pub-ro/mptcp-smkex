@@ -724,7 +724,7 @@ void mptcp_destroy_sock(struct sock *sk)
 static void mptcp_set_state(struct sock *sk)
 {
 	struct sock *meta_sk = mptcp_meta_sk(sk);
-    struct socket_wq *wq;
+	struct socket_wq *wq;
 
 	/* Meta is not yet established - wake up the application */
 	if ((1 << meta_sk->sk_state) & (TCPF_SYN_SENT | TCPF_SYN_RECV) &&
@@ -742,14 +742,14 @@ static void mptcp_set_state(struct sock *sk)
 	if (sk->sk_state == TCP_ESTABLISHED) {
 		tcp_sk(sk)->mptcp->establish_increased = 1;
 
-        rcu_read_lock();
+	    rcu_read_lock();
 		tcp_sk(sk)->mpcb->cnt_established++;
-        if (!sk->sk_wq) {
-            wq = rcu_dereference(sk->sk_wq);
-            if (wq_has_sleeper(wq))
-                wake_up_interruptible_poll(&wq->wait, POLLCONN);
-        }
-        rcu_read_unlock();
+	    if (!sk->sk_wq) {
+	        wq = rcu_dereference(sk->sk_wq);
+	        if (wq_has_sleeper(wq))
+	            wake_up_interruptible_poll(&wq->wait, POLLCONN);
+	    }
+	    rcu_read_unlock();
 	}
 }
 
