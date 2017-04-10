@@ -542,6 +542,7 @@ unsigned int tcp_poll(struct file *file, struct socket *sock, poll_table *wait)
             tp->mpcb->cnt_established >= tp->mpcb->est_threshold) {
             mask |= POLLCONN;
         }
+        /* printk("Poll check: %d %d\n", tp->mpcb->est_threshold, tp->mpcb->cnt_established); */
 
 		if (!(sk->sk_shutdown & SEND_SHUTDOWN)) {
 			if (sk_stream_is_writeable(sk)) {
