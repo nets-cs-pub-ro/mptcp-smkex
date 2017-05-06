@@ -538,11 +538,10 @@ unsigned int tcp_poll(struct file *file, struct socket *sock, poll_table *wait)
 		if (tp->rcv_nxt - tp->copied_seq >= target)
 			mask |= POLLIN | POLLRDNORM;
 
-	    if (mptcp(tp) && tp->mpcb != NULL && tp->mpcb->est_threshold > 0 &&
-	        tp->mpcb->cnt_established >= tp->mpcb->est_threshold) {
-	        mask |= POLLCONN;
-	    }
-	    /* printk("Poll check: %d %d\n", tp->mpcb->est_threshold, tp->mpcb->cnt_established); */
+		if (mptcp(tp) && tp->mpcb != NULL && tp->mpcb->est_threshold > 0 &&
+				tp->mpcb->cnt_established >= tp->mpcb->est_threshold) {
+			mask |= POLLCONN;
+		}
 
 		if (!(sk->sk_shutdown & SEND_SHUTDOWN)) {
 			if (sk_stream_is_writeable(sk)) {
@@ -2699,10 +2698,10 @@ static int do_tcp_setsockopt(struct sock *sk, int level,
 			mptcp_disable_sock(sk);
 		break;
 	case MPTCP_SET_SUB_EST_THRESHOLD:
-	    if (!mptcp(tp))
-	        return -EOPNOTSUPP;
-	    tp->mpcb->est_threshold = val;
-	    break;
+		if (!mptcp(tp))
+			return -EOPNOTSUPP;
+		tp->mpcb->est_threshold = val;
+		break;
 
 #endif
 	default:
@@ -3033,15 +3032,15 @@ static int do_tcp_getsockopt(struct sock *sk, int level,
 			return -EOPNOTSUPP;
 		return mptcp_getsockopt_sub_ids(sk, optval, optlen);
 	case MPTCP_GET_SUB_EST_COUNT:
-	    if (!mptcp(tp))
-	        return -EOPNOTSUPP;
-	    val = tp->mpcb->cnt_established;
-	    break;
+		if (!mptcp(tp))
+			return -EOPNOTSUPP;
+		val = tp->mpcb->cnt_established;
+		break;
 	case MPTCP_GET_SUB_EST_THRESHOLD:
-	    if (!mptcp(tp))
-	        return -EOPNOTSUPP;
-	    val = tp->mpcb->est_threshold;
-	    break;
+		if (!mptcp(tp))
+			return -EOPNOTSUPP;
+		val = tp->mpcb->est_threshold;
+		break;
 #endif
 	default:
 		return -ENOPROTOOPT;
