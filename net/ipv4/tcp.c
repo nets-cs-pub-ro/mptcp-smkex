@@ -538,9 +538,21 @@ unsigned int tcp_poll(struct file *file, struct socket *sock, poll_table *wait)
 		if (tp->rcv_nxt - tp->copied_seq >= target)
 			mask |= POLLIN | POLLRDNORM;
 
-		if (mptcp(tp) && tp->mpcb != NULL && tp->mpcb->est_threshold > 0 &&
-				tp->mpcb->cnt_established >= tp->mpcb->est_threshold) {
-			mask |= POLLCONN;
+		if (mptcp(tp)) {
+			if ((tp->mpcb != NULL) && (tp->mpcb->est_threshold > 0)) {
+				struct sock *sk_it;
+				u8 cnt = 0;
+
+				mptcp_for_each_sk(tp->mpcb, sk_it) {
+					if (tcp_sk(sk_it)->mptcp->fully_established ||
+					    sk_it->sk_state == TCP_ESTABLISHED) {
+						cnt++;
+					}
+				}
+				if (cnt >= tp->mpcb->est_threshold) {
+					mask |= POLLCONN;
+				}
+			}
 		}
 
 		if (!(sk->sk_shutdown & SEND_SHUTDOWN)) {
@@ -2829,6 +2841,7 @@ static int mptcp_getsockopt_sub_ids(struct sock *sk, char __user *optval,
 	struct mptcp_cb *mpcb = tp->mpcb;
 	struct mptcp_sub_ids *ids;
 	int len, needed_len;
+	u8 active_subflows = 0;
 	int i;
 
 	if (get_user(len, optlen))
@@ -2836,8 +2849,22 @@ static int mptcp_getsockopt_sub_ids(struct sock *sk, char __user *optval,
 
 /* TODO check if we need any lock ?? */
 
+	needed_len = 0;
+	mptcp_for_each_sk(mpcb, sk_loop) {
+		struct tcp_sock *tp_loop;
+		struct mptcp_tcp_sock *mp_tp;
+
+		tp_loop = tcp_sk(sk_loop);
+		mp_tp = tp_loop->mptcp;
+		if (!(mp_tp->fully_established) && (sk_loop->sk_state != TCP_ESTABLISHED))
+		{
+			continue;
+		}
+		active_subflows++;
+	}
+
 	needed_len = sizeof(struct mptcp_sub_ids) +
-		sizeof(struct mptcp_sub_status) * mpcb->cnt_subflows;
+		sizeof(struct mptcp_sub_status) * active_subflows;
 	if (len < needed_len)
 		return -EINVAL;
 
@@ -2861,10 +2888,16 @@ static int mptcp_getsockopt_sub_ids(struct sock *sk, char __user *optval,
 
 		tp_loop = tcp_sk(sk_loop);
 		mp_tp = tp_loop->mptcp;
+
+		if (!(mp_tp->fully_established) && (sk_loop->sk_state != TCP_ESTABLISHED)) {
+			continue;
+		}
+
 		ids->sub_status[i].id = mp_tp->path_index;
 		ids->sub_status[i].fully_established = mp_tp->fully_established;
 		ids->sub_status[i].attached = mp_tp->attached;
 		ids->sub_status[i].pre_established = mp_tp->pre_established;
+		ids->sub_status[i].slave_sk = mp_tp->slave_sk;
 		i++;
 	}
 
